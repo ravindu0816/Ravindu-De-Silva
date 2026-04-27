@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solve It With Ravindu De Silva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #355872;
+    --light: #7AAACE;
+    --lighter: #a8c8e8;
+    --darkest: #1e3a4f;
+    --white: #f4f9fd;
+    --text: #1a2e3d;
+    --card-bg: rgba(53,88,114,0.07);
+    --glass: rgba(122,170,206,0.13);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ─── PAGES ─── */
+  .page {
+    display: none;
+    min-height: 100vh;
+    animation: fadeIn 0.45s ease;
+  }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ─── NAV BAR ─── */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 64px;
+    box-shadow: 0 4px 24px rgba(53,88,114,0.18);
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .nav-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 2.5px solid var(--light);
+    background: linear-gradient(135deg, var(--light), var(--lighter));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--dark);
+    text-align: center; line-height: 1.2;
+    overflow: hidden;
+  }
+  .nav-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+  .nav-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--white);
+    line-height: 1.2;
+  }
+  .nav-title span { color: var(--lighter); font-weight: 700; }
+
+  /* hamburger */
+  .hamburger {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+  .hamburger:hover { background: rgba(255,255,255,0.1); }
+  .hamburger span {
+    display: block; width: 26px; height: 2.5px;
+    background: var(--white); border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+  /* ─── DROPDOWN MENU ─── */
+  .menu-dropdown {
+    position: fixed;
+    top: 64px; right: 0;
+    width: 220px;
+    background: var(--darkest);
+    border-left: 3px solid var(--light);
+    border-bottom: 3px solid var(--light);
+    border-radius: 0 0 0 16px;
+    padding: 8px 0 16px;
+    z-index: 200;
+    box-shadow: -4px 8px 32px rgba(30,58,79,0.35);
+    transform: translateX(110%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .menu-dropdown.open { transform: translateX(0); }
+  .menu-dropdown a {
+    display: block;
+    padding: 13px 28px;
+    color: var(--white);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, padding-left 0.2s;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+  }
+  .menu-dropdown a:hover {
+    background: rgba(122,170,206,0.13);
+    color: var(--lighter);
+    padding-left: 36px;
+    border-left-color: var(--light);
+  }
+
+  /* ─── HERO / MAIN PAGE ─── */
+  .hero {
+    min-height: calc(100vh - 64px);
+    background: linear-gradient(160deg, var(--white) 55%, #c8dfef 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 32px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(122,170,206,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -40px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(53,88,114,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    font-weight: 900;
+    color: var(--dark);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .hero-headline .accent { color: var(--light); }
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--darkest);
+    margin-bottom: 28px;
+  }
+  .who-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.85rem;
+    color: var(--light);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 48px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .who-link:hover { color: var(--dark); }
+  .who-link .arrow-badge {
+    background: var(--light);
+    color: white;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  /* service cards */
+  .service-cards { display: flex; flex-direction: column; gap: 18px; }
+  .service-card {
+    background: white;
+    border: 1.5px solid rgba(122,170,206,0.3);
+    border-radius: 16px;
+    padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 12px rgba(53,88,114,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--light), var(--dark));
+    border-radius: 4px 0 0 4px;
+  }
+  .service-card:hover {
+    border-color: var(--light);
+    box-shadow: 0 8px 32px rgba(122,170,206,0.22);
+    transform: translateX(4px);
+  }
+  .service-card-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+  .service-card-info p {
+    font-size: 0.8rem;
+    color: #6a8a9f;
+    font-weight: 400;
+  }
+  .chevron {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--dark), var(--light));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+  .service-card:hover .chevron { transform: scale(1.12) rotate(5deg); }
+  .chevron svg { width: 16px; height: 16px; fill: white; }
+
+  /* hero tagline */
+  .hero-tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--dark);
+    opacity: 0.45;
+    letter-spacing: 0.02em;
+    margin: 36px 0 28px;
+    font-style: italic;
+  }
+
+  /* footer */
+  .site-footer {
+    background: var(--dark);
+    color: rgba(255,255,255,0.7);
+    padding: 22px 28px;
+    font-size: 0.82rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .footer-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .footer-icons { display: flex; gap: 10px; }
+  .footer-icon {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(122,170,206,0.2);
+    border: 1px solid var(--light);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--lighter);
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .footer-icon:hover { background: var(--light); color: white; }
+  .footer-copy { color: rgba(255,255,255,0.4); font-size: 0.75rem; }
+
+  /* ─── WHO AM I PAGE ─── */
+  .page-header {
+    background: linear-gradient(135deg, var(--darkest) 0%, var(--dark) 100%);
+    padding: 48px 32px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute; bottom: 0; right: 0;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(122,170,206,0.15) 0%, transparent 70%);
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem,5vw,3rem);
+    color: white;
+    margin-bottom: 6px;
+  }
+  .page-header p { color: var(--lighter); font-size: 0.9rem; }
+
+  .page-content { padding: 36px 28px; max-width: 860px; margin: 0 auto; }
+
+  .profile-card {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 4px 32px rgba(53,88,114,0.1);
+    border: 1px solid rgba(122,170,206,0.2);
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .profile-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--light), var(--lighter));
+    border: 3px solid var(--light);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--dark);
+    text-align: center;
+    overflow: hidden;
+  }
+  .profile-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+  .profile-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--dark);
+    margin-bottom: 16px;
+  }
+  .profile-text p {
+    color: #4a6478;
+    line-height: 1.8;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+  }
+
+  /* ─── PHOTOGRAPHY PAGE ─── */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 32px 28px;
+  }
+  @media(max-width:600px) { .photo-grid { grid-template-columns: 1fr 1fr; } }
+  .photo-btn {
+    background: white;
+    border: 1.5px solid rgba(122,170,206,0.3);
+    border-radius: 14px;
+    padding: 20px 14px 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.28s ease;
+    box-shadow: 0 2px 10px rgba(53,88,114,0.07);
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+  .photo-btn:hover {
+    border-color: var(--light);
+    box-shadow: 0 6px 24px rgba(122,170,206,0.2);
+    transform: translateY(-4px);
+    background: linear-gradient(160deg, white, #eaf3fb);
+  }
+  .photo-btn-icon {
+    width: 46px; height: 46px;
+    background: linear-gradient(135deg, var(--dark), var(--light));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 20px;
+  }
+  .photo-btn h3 {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+  .photo-btn .btn-arrow {
+    font-size: 0.72rem;
+    color: var(--light);
+    font-weight: 500;
+  }
+
+  /* ─── IT SOLUTION PAGE ─── */
+  .it-list { padding: 32px 28px; display: flex; flex-direction: column; gap: 14px; }
+  .it-item {
+    background: white;
+    border-radius: 14px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1.5px solid rgba(122,170,206,0.25);
+    box-shadow: 0 2px 10px rgba(53,88,114,0.06);
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.28s;
+  }
+  .it-item:hover {
+    border-color: var(--light);
+    box-shadow: 0 6px 24px rgba(122,170,206,0.18);
+    transform: translateX(6px);
+  }
+  .it-item-left { display: flex; align-items: center; gap: 16px; }
+  .it-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--light), var(--dark));
+    flex-shrink: 0;
+  }
+  .it-item h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--dark); }
+  .it-chevron { color: var(--light); font-size: 1.2rem; font-weight: 700; }
+
+  /* ─── CONTACT PAGE ─── */
+  .contact-section { padding: 32px 28px; max-width: 560px; margin: 0 auto; }
+  .contact-phone {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 28px;
+    padding: 16px 22px;
+    background: white;
+    border-radius: 12px;
+    border: 1.5px solid rgba(122,170,206,0.3);
+  }
+  .contact-channels { display: flex; flex-direction: column; gap: 14px; }
+  .contact-channel {
+    background: white;
+    border-radius: 14px;
+    border: 1.5px solid rgba(122,170,206,0.25);
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s;
+    box-shadow: 0 2px 8px rgba(53,88,114,0.06);
+  }
+  .contact-channel:hover {
+    border-color: var(--light);
+    box-shadow: 0 6px 24px rgba(122,170,206,0.18);
+    transform: translateY(-2px);
+  }
+  .contact-channel-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .contact-channel.whatsapp .contact-channel-icon { background: #e8f8ee; }
+  .contact-channel.facebook .contact-channel-icon { background: #e8f0ff; }
+  .contact-channel.gmail .contact-channel-icon { background: #fde8e8; }
+  .contact-channel h3 { font-size: 0.95rem; font-weight: 600; color: var(--dark); }
+  .contact-channel p { font-size: 0.8rem; color: #7a9aae; }
+  .channel-arrow { margin-left: auto; color: var(--light); font-size: 1.1rem; font-weight: 700; }
+  .click-badge {
+    background: var(--light);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-left: 6px;
+  }
+
+  /* ─── REVIEWS PAGE ─── */
+  .reviews-section { padding: 32px 28px; }
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .review-card {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    border: 1.5px solid rgba(122,170,206,0.2);
+    box-shadow: 0 2px 12px rgba(53,88,114,0.07);
+    transition: box-shadow 0.25s, transform 0.25s;
+  }
+  .review-card:hover { box-shadow: 0 8px 28px rgba(122,170,206,0.18); transform: translateY(-3px); }
+  .review-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .review-avatar {
+    width: 46px; height: 46px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--light), var(--lighter));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--dark);
+    text-align: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .review-avatar img { width:100%; height:100%; object-fit:cover; border-radius:10px; }
+  .review-name { font-weight: 600; color: var(--dark); font-size: 0.9rem; }
+  .review-stars { color: #f5a623; font-size: 0.75rem; }
+  .review-text { font-size: 0.85rem; color: #5a7a8e; line-height: 1.7; }
+
+  .feedback-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--dark), var(--light));
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .feedback-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+  /* back btn */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: var(--lighter);
+    font-size: 0.82rem;
+    padding: 8px 0;
+    cursor: pointer;
+    background: none; border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: white; }
+
+  /* section divider */
+  .section-divider {
+    height: 2px;
+    background: linear-gradient(90deg, var(--light), transparent);
+    margin: 0 28px 28px;
+    border-radius: 2px;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:500px) {
+    .photo-grid { grid-template-columns: 1fr 1fr; }
+    .profile-card { flex-direction: column; }
+    .hero { padding: 40px 20px 32px; }
+    .page-content, .photo-grid, .it-list, .contact-section, .reviews-section { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ Latest POPUP BUTTON ═══ -->
+
+<div id="season-popup" style="
+    position: fixed;
+    bottom: 28px; right: 20px;
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;">
+
+  <!-- Close X button -->
+  <button onclick="closeSeasonPopup()" style="
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      margin-right: 4px;">✕</button>
+
+  <!-- Popup card -->
+  <a href="https://ravindu0816.github.io/Vesak-2026/" target="_blank" style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      border: 2px solid #7AAACE;
+      border-radius: 16px;
+      padding: 10px 12px;
+      width: 130px;
+      text-decoration: none;
+      box-shadow: 0 8px 28px rgba(53,88,114,0.22);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;"
+    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 14px 36px rgba(53,88,114,0.28)'"
+    onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 28px rgba(53,88,114,0.22)'">
+
+    <!-- Topic -->
+    <div style="
+        font-family: 'Playfair Display', serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #355872;
+        margin-bottom: 7px;
+        text-align: center;">Latest >>></div>
+
+    <!-- Image -->
+    <img src="latest.jpg" alt="Season"
+      onerror="this.style.background='linear-gradient(135deg,#7AAACE,#355872)';this.src=''"
+      style="
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1.5px solid rgba(122,170,206,0.3);">
+  </a>
+</div>
+
+<script>
+  function closeSeasonPopup() {
+    document.getElementById('season-popup').style.display = 'none';
+  }
+
+  // Auto close popup when menu opens
+  const _origToggleMenu = toggleMenu;
+  toggleMenu = function(suffix) {
+    closeSeasonPopup();
+    _origToggleMenu(suffix);
+  };
+</script>
+
+  
+  <!-- Coming Soon Popup -->
+<div id="coming-soon-overlay" onclick="closeComingSoon()" style="
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(30,58,79,0.7); z-index:999; backdrop-filter:blur(4px);
+    align-items:center; justify-content:center;">
+    <div onclick="event.stopPropagation()" style="
+        background:white; border-radius:24px; padding:48px 36px; text-align:center;
+        max-width:320px; width:90%; box-shadow:0 20px 60px rgba(53,88,114,0.3);
+        border-top:4px solid #7AAACE;">
+        <div style="font-size:3rem; margin-bottom:16px;">🚀</div>
+        <h2 style="font-family:'Playfair Display',serif; color:#355872; font-size:1.8rem; margin-bottom:10px;">Coming Soon</h2>
+        <p style="color:#7a9aae; font-size:0.92rem; line-height:1.7; margin-bottom:28px;">This section is under construction.<br>Check back soon!</p>
+        <button onclick="closeComingSoon()" style="
+            background:linear-gradient(135deg,#355872,#7AAACE); color:white;
+            border:none; padding:12px 32px; border-radius:12px; font-size:0.95rem;
+            font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif;">
+            Got it!
+        </button>
+    </div>
+</div>
+
+<script>
+  function comingSoon() {
+      const overlay = document.getElementById('coming-soon-overlay');
+      overlay.style.display = 'flex';
+  }
+  function closeComingSoon() {
+      document.getElementById('coming-soon-overlay').style.display = 'none';
+  }
+</script>
+
+<!-- ═══════════════════════════════════════ MAIN PAGE ═══════════════════════════════════════ -->
+<div id="page-main" class="page active">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-avatar" id="main-avatar">
+    <img src="mypic.jpg" alt="Ravindu">
+</div>
+      <div class="nav-title">Solve It With<br><span>Ravindu De Silva</span></div>
+    </div>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+  <div class="menu-dropdown" id="menu-dropdown">
+    <a onclick="goTo('page-who')">Who Am I</a>
+    <a onclick="goTo('page-photography')">Photography</a>
+    <a onclick="goTo('page-it')">IT Solution</a>
+    <a onclick="goTo('page-contact')">Contact</a>
+    <a onclick="goTo('page-reviews')">Reviews</a>
+  </div>
+
+  <section class="hero">
+    <div class="hero-headline">Solve It <span class="accent">With</span></div>
+    <div class="hero-name">Ravindu De Silva</div>
+    <a class="who-link" onclick="goTo('page-who')">
+      who am I? <span class="arrow-badge">›</span>
+    </a>
+    <div class="service-cards">
+      <div class="service-card" onclick="goTo('page-photography')">
+        <div class="service-card-info">
+          <h3>Photography</h3>
+          <p>Photoshoot / Photo colorize / Graphic Design / Video editing &amp; more...</p>
+        </div>
+        <div class="chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+      <div class="service-card" onclick="goTo('page-it')">
+        <div class="service-card-info">
+          <h3>IT Solution</h3>
+          <p>Website / Systems / Social Media handling</p>
+        </div>
+        <div class="chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+    </div>
+    <p class="hero-tagline">Make your future easy...</p>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-row">
+      <span>Contact: +94740398802</span>
+      <div class="footer-icons">
+        <a href="https://wa.me/94740398802" class="footer-icon" title="WhatsApp">wp</a>
+        <a href="https://www.facebook.com/share/1CrucwxssR/" class="footer-icon" title="Facebook">fb</a>
+        <a href="https://www.instagram.com/ravindu.dsilva?igsh=eXJndGQyaW9hemZx" class="footer-icon" title="Instagram">ig</a>
+        <a href="https://www.linkedin.com/in/ravindu-de-silva-41335134b?utm_source=share_via&utm_content=profile&utm_medium=member_android" class="footer-icon" title="LinkedIn">in</a>
+      </div>
+      <span>ravindudesilva2004@gmail.com</span>
+    </div>
+    <div class="footer-copy">Copyright © 2026 - Ravindu De Silva.</div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════ WHO AM I PAGE ═══════════════════════════════════════ -->
+<div id="page-who" class="page">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <button class="back-btn" onclick="goTo('page-main')">← Back</button>
+    </div>
+    <div class="hamburger" id="hamburger-who" onclick="toggleMenu('who')">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+  <div class="menu-dropdown" id="menu-dropdown-who">
+    <a onclick="goTo('page-who')">Who Am I</a>
+    <a onclick="goTo('page-photography')">Photography</a>
+    <a onclick="goTo('page-it')">IT Solution</a>
+    <a onclick="goTo('page-contact')">Contact</a>
+    <a onclick="goTo('page-reviews')">Reviews</a>
+  </div>
+
+  <div class="page-header">
+    <h1>Who Am I</h1>
+    <p>Get to know Ravindu De Silva</p>
+  </div>
+
+  <div class="page-content">
+    <div class="profile-card">
+      <div class="profile-avatar" id="who-avatar">
+    <img src="mypic.jpg" alt="Ravindu">
+</div>
+      <div class="profile-text">
+        <h2>Ravindu De Silva</h2>
+        <p>I'm a passionate undergraduate with a strong interest in technology, creativity and continuous learning. Currently, I am exploring the fields of web development, cybersecurity and digital innovation, building a solid foundation for my future career in the tech industry. I enjoy turning ideas into functional and meaningful digital experiences, combining both technical skills and creative thinking.</p>
+        <p>My journey in web development allows me to design and develop user-friendly websites, focusing on simplicity, performance and modern design principles. At the same time, my curiosity for cybersecurity drives me to understand how systems work behind the scenes and how to make them more secure and reliable in an increasingly digital world.</p>
+        <p>Beyond technology, I have a deep passion for photography. Through my lens, I capture moments, emotions, and stories that often go unnoticed. Photography, for me, is more than just taking pictures. It's about expressing perspective and preserving memories. Using my mobile device, I continuously experiment with composition, lighting and storytelling, shaping my unique visual style.</p>
+        <p>I believe in growth through consistency, creativity, and exploration. Every project I work on and every photo I take reflects my journey of learning and self-expression. I am always open to new opportunities, collaborations, and challenges that help me improve and expand my skills.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;">
+      <div style="background:white; border:1.5px solid rgba(122,170,206,0.3); border-radius:12px; padding:16px 22px; flex:1; min-width:140px; text-align:center;">
+        <div style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900; color:var(--dark);">Web Dev</div>
+        <div style="font-size:0.78rem; color:#7a9aae; margin-top:4px;">HTML · CSS · JS</div>
+      </div>
+      <div style="background:white; border:1.5px solid rgba(122,170,206,0.3); border-radius:12px; padding:16px 22px; flex:1; min-width:140px; text-align:center;">
+        <div style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900; color:var(--dark);">Security</div>
+        <div style="font-size:0.78rem; color:#7a9aae; margin-top:4px;">Cybersecurity</div>
+      </div>
+      <div style="background:white; border:1.5px solid rgba(122,170,206,0.3); border-radius:12px; padding:16px 22px; flex:1; min-width:140px; text-align:center;">
+        <div style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900; color:var(--dark);">Photo</div>
+        <div style="font-size:0.78rem; color:#7a9aae; margin-top:4px;">Mobile Photography</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+  <div style="padding:0 28px 24px; color:#6a8a9f; font-size:0.82rem;">
+    <b>Contact:</b> +94740398802 &nbsp;|&nbsp;
+    <a href="https://wa.me/94740398802" style="color:var(--light);">WhatsApp</a> &nbsp;
+    <a href="https://www.facebook.com/share/1CrucwxssR/" style="color:var(--light);">Facebook</a> &nbsp;
+    <a href="https://www.instagram.com/ravindu.dsilva?igsh=eXJndGQyaW9hemZx" style="color:var(--light);">Instagram</a> &nbsp;
+    <a href="https://www.linkedin.com/in/ravindu-de-silva-41335134b?utm_source=share_via&utm_content=profile&utm_medium=member_android" style="color:var(--light);">LinkedIn</a> &nbsp;|&nbsp;
+    ravindudesilva2004@gmail.com
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ PHOTOGRAPHY PAGE ═══════════════════════════════════════ -->
+<div id="page-photography" class="page">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <button class="back-btn" onclick="goTo('page-main')">← Back</button>
+    </div>
+    <div class="hamburger" id="hamburger-photo" onclick="toggleMenu('photo')">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+  <div class="menu-dropdown" id="menu-dropdown-photo">
+    <a onclick="goTo('page-who')">Who Am I</a>
+    <a onclick="goTo('page-photography')">Photography</a>
+    <a onclick="goTo('page-it')">IT Solution</a>
+    <a onclick="goTo('page-contact')">Contact</a>
+    <a onclick="goTo('page-reviews')">Reviews</a>
+  </div>
+
+  <div class="page-header">
+    <h1>Photography</h1>
+    <p>Creative visual services</p>
+  </div>
+
+  <div class="photo-grid">
+    <a href="#" onclick="comingSoon()" class="photo-btn">
+      <div class="photo-btn-icon">📷</div>
+      <h3>Photograph</h3>
+      <div class="btn-arrow">Explore ›</div>
+    </a>
+    <a href="#" onclick="comingSoon()" class="photo-btn">
+      <div class="photo-btn-icon">🎞️</div>
+      <h3>Photoshoot</h3>
+      <div class="btn-arrow">Explore ›</div>
+    </a>
+    <a href="#" onclick="comingSoon()" class="photo-btn">
+      <div class="photo-btn-icon">🎨</div>
+      <h3>Colorize Image</h3>
+      <div class="btn-arrow">Explore ›</div>
+    </a>
+    <a href="#" onclick="comingSoon()" class="photo-btn">
+      <div class="photo-btn-icon">🖼️</div>
+      <h3>Artwork</h3>
+      <div class="btn-arrow">Explore ›</div>
+    </a>
+    <a href="#" onclick="comingSoon()" class="photo-btn">
+      <div class="photo-btn-icon">🎬</div>
+      <h3>Video Edit</h3>
+      <div class="btn-arrow">Explore ›</div>
+    </a>
+    <a href="#" onclick="comingSoon()" class="photo-btn">
+      <div class="photo-btn-icon">✨</div>
+      <h3>Logo</h3>
+      <div class="btn-arrow">Explore ›</div>
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ IT SOLUTION PAGE ═══════════════════════════════════════ -->
+<div id="page-it" class="page">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <button class="back-btn" onclick="goTo('page-main')">← Back</button>
+    </div>
+    <div class="hamburger" id="hamburger-it" onclick="toggleMenu('it')">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+  <div class="menu-dropdown" id="menu-dropdown-it">
+    <a onclick="goTo('page-who')">Who Am I</a>
+    <a onclick="goTo('page-photography')">Photography</a>
+    <a onclick="goTo('page-it')">IT Solution</a>
+    <a onclick="goTo('page-contact')">Contact</a>
+    <a onclick="goTo('page-reviews')">Reviews</a>
+  </div>
+
+  <div class="page-header">
+    <h1>IT Solution</h1>
+    <p>Website · Systems · Social Media handling</p>
+  </div>
+
+<!--Mini projects-->
+
+  <div class="it-list">
+    <a onclick="goTo('page-miniprojects')" class="it-item">
+        <div class="it-item-left">
+            <div class="it-dot"></div>
+            <div>
+                <h3>Mini Projects</h3>
+                <div style="font-size:0.8rem; color:#7a9aae;">Small creative builds</div>
+            </div>
+        </div>
+        <span class="it-chevron">›</span>
+    </a>
+    </div>
+<!--<div class="it-list">
+      <a href="#" onclick="comingSoon()" class="it-item">
+      <div class="it-item-left">
+        <div class="it-dot"></div>
+        <div>
+          <h3>New project</h3>
+          <div style="font-size:0.8rem; color:#7a9aae;">Special seasonal project</div>
+        </div>
+      </div>
+      <span class="it-chevron">›</span>
+    </a> -->
+
+<!--Vesak 2026-->
+
+  <div class="it-list">
+      <a href="https://ravindu0816.github.io/Vesak-2026/" class="it-item">
+      <div class="it-item-left">
+        <div class="it-dot"></div>
+        <div>
+          <h3>Vesak 2026</h3>
+          <div style="font-size:0.8rem; color:#7a9aae;">Special seasonal project</div>
+        </div>
+      </div>
+      <span class="it-chevron">›</span>
+    </a> 
+
+<!--Avurudu Nekath 2026-->
+
+    <a href="https://ravindu0816.github.io/Awurudu-Nakath-2026/" class="it-item">
+      <div class="it-item-left">
+        <div class="it-dot"></div>
+        <div>
+          <h3>Avurudu Nekath 2026</h3>
+          <div style="font-size:0.8rem; color:#7a9aae;">Special seasonal project</div>
+        </div>
+      </div>
+      <span class="it-chevron">›</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ CONTACT PAGE ═══════════════════════════════════════ -->
+<div id="page-contact" class="page">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <button class="back-btn" onclick="goTo('page-main')">← Back</button>
+    </div>
+    <div class="hamburger" id="hamburger-contact" onclick="toggleMenu('contact')">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+  <div class="menu-dropdown" id="menu-dropdown-contact">
+    <a onclick="goTo('page-who')">Who Am I</a>
+    <a onclick="goTo('page-photography')">Photography</a>
+    <a onclick="goTo('page-it')">IT Solution</a>
+    <a onclick="goTo('page-contact')">Contact</a>
+    <a onclick="goTo('page-reviews')">Reviews</a>
+  </div>
+
+  <div class="page-header">
+    <h1>Contact</h1>
+    <p>Get in touch with Ravindu</p>
+  </div>
+
+  <div class="contact-section">
+    <div class="contact-phone">📞 +94740398802</div>
+    <div class="contact-channels">
+      <a href="https://wa.me/94740398802" class="contact-channel whatsapp">
+        <div class="contact-channel-icon">WP</div>
+        <div>
+          <h3>WhatsApp <span class="click-badge">click</span></h3>
+          <p>Chat directly on WhatsApp</p>
+        </div>
+        <span class="channel-arrow">›</span>
+      </a>
+      <a href="https://www.facebook.com/share/1CrucwxssR/" class="contact-channel facebook">
+        <div class="contact-channel-icon">FB</div>
+        <div>
+          <h3>Facebook <span class="click-badge">click</span></h3>
+          <p>Connect on Facebook</p>
+        </div>
+        <span class="channel-arrow">›</span>
+      </a>
+      <a href="https://www.instagram.com/ravindu.dsilva?igsh=eXJndGQyaW9hemZx" class="contact-channel facebook">
+        <div class="contact-channel-icon">IG</div>
+        <div>
+          <h3>Instagram <span class="click-badge">click</span></h3>
+          <p>Connect on Instagram</p>
+        </div>
+        <span class="channel-arrow">›</span>
+      </a>
+      <a href="https://www.linkedin.com/in/ravindu-de-silva-41335134b?utm_source=share_via&utm_content=profile&utm_medium=member_android" class="contact-channel facebook">
+        <div class="contact-channel-icon">IN</div>
+        <div>
+          <h3>LinkedIn <span class="click-badge">click</span></h3>
+          <p>Connect on LinkedIn</p>
+        </div>
+        <span class="channel-arrow">›</span>
+      </a>
+      <a href="mailto:ravindudesilva2004@gmail.com" class="contact-channel gmail">
+        <div class="contact-channel-icon">GM</div>
+        <div>
+          <h3>Gmail</h3>
+          <p>ravindudesilva2004@gmail.com</p>
+        </div>
+        <span class="channel-arrow">›</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ REVIEWS PAGE ═══════════════════════════════════════ -->
+<div id="page-reviews" class="page">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <button class="back-btn" onclick="goTo('page-main')">← Back</button>
+    </div>
+    <div class="hamburger" id="hamburger-reviews" onclick="toggleMenu('reviews')">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+  <div class="menu-dropdown" id="menu-dropdown-reviews">
+    <a onclick="goTo('page-who')">Who Am I</a>
+    <a onclick="goTo('page-photography')">Photography</a>
+    <a onclick="goTo('page-it')">IT Solution</a>
+    <a onclick="goTo('page-contact')">Contact</a>
+    <a onclick="goTo('page-reviews')">Reviews</a>
+  </div>
+
+  <div class="page-header">
+    <h1>Reviews</h1>
+    <p>What clients say</p>
+  </div>
+
+  <div class="reviews-section">
+    <div class="reviews-grid">
+      <!-- Review 1 -->
+      <div class="review-card">
+        <div class="review-card-top">
+          <div class="review-avatar">Pic</div>
+          <div>
+            <div class="review-name">Name</div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+        </div>
+        <p class="review-text">Add your client review text here. Great work and professional service!</p>
+      </div>
+      <!-- Review 2 -->
+      <div class="review-card">
+        <div class="review-card-top">
+          <div class="review-avatar">Pic</div>
+          <div>
+            <div class="review-name">Name</div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+        </div>
+        <p class="review-text">Add your client review text here. Excellent photography and creative vision!</p>
+      </div>
+      <!-- Review 3 -->
+      <div class="review-card">
+        <div class="review-card-top">
+          <div class="review-avatar">Pic</div>
+          <div>
+            <div class="review-name">Name</div>
+            <div class="review-stars">★★★★☆</div>
+          </div>
+        </div>
+        <p class="review-text">Add your client review text here. Highly recommended IT solutions!</p>
+      </div>
+    </div>
+
+    <a href="#LINK_FEEDBACK" class="feedback-btn">
+      Your Feedback &nbsp;›
+    </a>
+  </div>
+</div>
+
+<!-- MINI PROJECTS PAGE -->
+
+<div id="page-miniprojects" class="page">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <button class="back-btn" onclick="goTo('page-it')">← Back</button>
+    </div>
+    <div class="hamburger" id="hamburger-mini" onclick="toggleMenu('mini')">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+  <div class="menu-dropdown" id="menu-dropdown-mini">
+    <a onclick="goTo('page-who')">Who Am I</a>
+    <a onclick="goTo('page-photography')">Photography</a>
+    <a onclick="goTo('page-it')">IT Solution</a>
+    <a onclick="goTo('page-contact')">Contact</a>
+    <a onclick="goTo('page-reviews')">Reviews</a>
+  </div>
+
+  <div class="page-header">
+    <h1>Mini Projects</h1>
+    <p>Small creative builds by Ravindu</p>
+  </div>
+
+  <div class="it-list">
+
+<!--Exam-Timetable-23/24-ICT-1.1-->
+
+    <a href="https://ravindu0816.github.io/Exam-Timetable-23-24-ICT-1.1/" class="it-item">
+      <div class="it-item-left">
+        <div class="it-dot"></div>
+        <div>
+          <h3>Exam Timetable</h3>
+          <div style="font-size:0.8rem; color:#7a9aae;">Exam Timetable for first year first semester ICT student of 23/24 batch.</div>
+        </div>
+      </div>
+      <span class="it-chevron">›</span>
+    </a>
+
+<!--Study Schedule for Exam 260425-->
+
+    <a href="https://ravindu0816.github.io/Study-Schedule-for-Exam-260425/" class="it-item">
+      <div class="it-item-left">
+        <div class="it-dot"></div>
+        <div>
+          <h3>Study Schedule for Exam</h3>
+          <div style="font-size:0.8rem; color:#7a9aae;">Study Schedule for seven subject within 5 days.</div>
+        </div>
+      </div>
+      <span class="it-chevron">›</span>
+    </a> 
+
+  </div>
+</div>
+
+<script>
+  // ─── Page Navigation ───
+  function goTo(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    window.scrollTo(0, 0);
+    closeAllMenus();
+  }
+
+  // ─── Menu Toggle ───
+  let openMenuSuffix = null;
+
+  function toggleMenu(suffix) {
+    suffix = suffix || '';
+    const hamburgerId = suffix ? 'hamburger-' + suffix : 'hamburger';
+    const dropdownId  = suffix ? 'menu-dropdown-' + suffix : 'menu-dropdown';
+    const hamburger   = document.getElementById(hamburgerId);
+    const dropdown    = document.getElementById(dropdownId);
+
+    const isOpen = dropdown.classList.contains('open');
+
+    closeAllMenus();
+
+    if (!isOpen) {
+      hamburger.classList.add('open');
+      dropdown.classList.add('open');
+      openMenuSuffix = suffix;
+    } else {
+      openMenuSuffix = null;
+    }
+  }
+
+  function closeAllMenus() {
+    document.querySelectorAll('.hamburger').forEach(h => h.classList.remove('open'));
+    document.querySelectorAll('.menu-dropdown').forEach(d => d.classList.remove('open'));
+    openMenuSuffix = null;
+  }
+
+  // Close menu on outside click
+  document.addEventListener('click', function(e) {
+    const isHamburger = e.target.closest('.hamburger');
+    const isMenu      = e.target.closest('.menu-dropdown');
+    if (!isHamburger && !isMenu) closeAllMenus();
+  });
+</script>
+</body>
+</html>
